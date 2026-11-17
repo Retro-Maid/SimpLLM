@@ -1,0 +1,10 @@
+# 改行は LF で統一する (Git の設定で CRLF に変わらないようにする)。バッチファイルだけは Windows の決まりで CRLF
+* text=auto eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+*.png binary
+*.ico binary
+*.webp binary
+*.gguf binary
+*.gif binary

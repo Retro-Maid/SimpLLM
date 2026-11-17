@@ -1,0 +1,83 @@
+{
+  "about": "モデルの設定。画像用は系統ごとの推奨設定で、フォルダに置いたファイルの中身から系統を判定して使う。source: builtin = 同梱 (RTX 3060・1024x1024 で確認済み) / auto = 新しいモデルを見つけたときに標準的な値で自動作成 (未確認) / user = 設定画面で直したもの。チャット用はファイル名ごとの表示名と推奨の生成パラメータ。設定画面の「モデルのフォルダ」から編集できる。",
+  "image": [
+    {
+      "id": "chroma-flash",
+      "label": "Chroma Flash",
+      "note": "@note.chroma-flash",
+      "source": "builtin",
+      "verified": true,
+      "diffusion": "chroma",
+      "match": "flash",
+      "files": {
+        "t5xxl": "text:t5",
+        "vae": "vae:flux1"
+      },
+      "modes": [
+        "generate"
+      ],
+      "translate": true,
+      "params": {
+        "steps": 8,
+        "cfg-scale": 1,
+        "sampling-method": "euler",
+        "scheduler": "simple",
+        "model-args": "chroma_use_dit_mask=false",
+        "flash-attn": "auto"
+      },
+      "negative": ""
+    },
+    {
+      "id": "chroma",
+      "label": "Chroma",
+      "note": "@note.chroma",
+      "source": "builtin",
+      "verified": true,
+      "diffusion": "chroma",
+      "match": "",
+      "files": {
+        "t5xxl": "text:t5",
+        "vae": "vae:flux1"
+      },
+      "modes": [
+        "generate"
+      ],
+      "translate": true,
+      "params": {
+        "steps": 26,
+        "cfg-scale": 3,
+        "sampling-method": "euler",
+        "scheduler": "simple",
+        "model-args": "chroma_use_dit_mask=false"
+      },
+      "negative": "low quality, ugly, unfinished, out of focus, deformed, disfigure, blurry, smudged, restricted palette, flat colors"
+    },
+    {
+      "id": "qwen-image-2.1",
+      "label": "Qwen-Image 2.1",
+      "note": "@note.qwen-image-2.1",
+      "source": "builtin",
+      "verified": false,
+      "diffusion": "qwen-image-2.1",
+      "match": "",
+      "files": {
+        "llm": "text:qwen3vl",
+        "vae": "vae:qwen-image-2.1"
+      },
+      "modes": [
+        "generate"
+      ],
+      "translate": false,
+      "params": {
+        "steps": 25,
+        "cfg-scale": 1,
+        "sampling-method": "euler",
+        "scheduler": "simple",
+        "flash-attn": "auto"
+      },
+      "negative": "",
+      "editSteps": 40
+    }
+  ],
+  "chat": []
+}

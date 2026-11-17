@@ -1,0 +1,73 @@
+# 公開するものだけを列挙し、それ以外はすべて除外する (許可リスト方式)。
+# フォルダの直下に新しく置いたファイルやフォルダ (メモ、ツールの設定、作業用のフォルダなど) は、
+# ここに足さない限り記録されない。公開するファイルを増やすときは、下の「公開するもの」に足す
+
+# ---- フォルダの直下: いったんすべて除外 ------------------------------------------
+/*
+
+# ---- 公開するもの ------------------------------------------------------------------
+!/.gitattributes
+!/.gitignore
+!/README.md
+!/README.*.md
+!/LICENSE
+!/start.bat
+!/simpllm.ico
+!/src/
+!/bin/
+!/models/
+!/img/
+
+# ---- 公開するフォルダの中の除外 ----------------------------------------------------
+# 利用者が自分で入れるもの (llama.cpp 本体・画像エンジン・モデル)。フォルダと説明だけを記録する
+/bin/*
+!/bin/README.md
+/models/*
+!/models/README.md
+# README に載せる画像だけを記録する (素材・作業用の画像は記録しない。足すときは、埋め込まれた情報が無いことを確かめる)
+/img/*
+!/img/simpllm-readme.png
+!/img/ja_guidance.png
+!/img/en_guidance.png
+!/img/de_guidance.png
+!/img/zh_guidance.png
+!/img/ko_guidance.png
+
+# ---- どこにあっても除外 -------------------------------------------------------------
+# モデルの重み・実行ファイル・圧縮ファイル (誤ってフォルダの中に置いたとき)
+*.gguf
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.onnx
+*.exe
+*.dll
+*.zip
+*.7z
+*.rar
+
+# アプリが実行中に作るもの (通常はフォルダの直下に作るので上で除外済み。念のため)
+*.wiping
+*.tmp
+*.log
+*.pma
+history/
+browser-profile/
+
+# エディタ・ツールの作業ファイル
+.*/
+*.swp
+*.swo
+*~
+*.bak
+*.orig
+*.rej
+node_modules/
+
+# OS が作るファイル
+Thumbs.db
+ehthumbs.db
+desktop.ini
+.DS_Store
+$RECYCLE.BIN/

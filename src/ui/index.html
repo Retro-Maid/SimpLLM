@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- テンプレート。文言は data-i18n 属性のキーで指定し、src\lang\<言語>.json から入れる (i18n.js)。
+     start.ps1 が style.css / *.js を埋め込み、ハッシュ付きCSPを生成して public\index.html を出力する。
+     外部への通信は一切禁止し、接続先は同一オリジン (llama-server) と起動スクリプトの受付 (127.0.0.1) のみ。埋め込んだ以外のスクリプトは実行されない。
+     img-src の data: は添付画像のサムネイル表示用 -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src '{{SCRIPT_HASH}}'; worker-src blob:; style-src '{{STYLE_HASH}}'; connect-src 'self' http://127.0.0.1:{{CONTROL_PORT}}; img-src data:; base-uri 'none'; form-action 'none'; require-trusted-types-for 'script'; trusted-types simpllm-worker">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="dark">
+<title>simpllm</title>
+<link rel="icon" sizes="16x16" type="image/png" href="data:image/png;base64,{{FAVICON16}}">
+<link rel="icon" sizes="32x32" type="image/png" href="data:image/png;base64,{{FAVICON32}}">
+<style>{{STYLE}}</style>
+</head>
+<body>
+<template id="welcome-template">
+  <section class="welcome" aria-label="SimpLLM">
+    <img class="welcome-logo" src="data:image/webp;base64,{{LOGO}}" data-i18n-alt="ui.welcomeTemplate.img1.alt" width="720" height="550" decoding="async" draggable="false">
+    <h1 class="welcome-title">{{WORDMARK}}</h1>
+  </section>
+</template>
+<div id="app">
+  <aside id="sidebar">
+    <div class="side-head">
+      <button id="btn-side-close" type="button" class="icon-btn" data-i18n-title="ui.btnSideClose.title" data-icon="sidebar"></button>
+      <select id="model-select" data-i18n-title="ui.modelSelect.title" data-i18n-aria-label="ui.modelSelect.ariaLabel" hidden></select>
+      <span class="side-actions">
+        <button id="btn-new-project" type="button" class="icon-btn advanced-only" data-i18n-title="ui.btnNewProject.title" data-icon="project"></button>
+        <button id="btn-select" type="button" class="icon-btn advanced-only" data-i18n-title="ui.btnSelect.title" data-icon="select"></button>
+        <button id="btn-new" type="button" class="icon-btn" data-i18n-title="ui.btnNew.title" data-icon="compose"></button>
+      </span>
+    </div>
+    <label class="search"><span data-icon="search"></span><input id="search" type="search" data-i18n-placeholder="ui.search.placeholder" autocomplete="off"></label>
+    <nav id="chat-list"></nav>
+    <div id="bulk" class="bulk" hidden>
+      <div class="bulk-head">
+        <span id="bulk-count"></span>
+        <button id="btn-bulk-all" type="button" class="bulk-link" data-i18n="ui.btnBulkAll"></button>
+        <button id="btn-bulk-close" type="button" class="icon-btn" data-i18n-title="ui.btnBulkClose.title" data-icon="x"></button>
+      </div>
+      <div id="bulk-actions" class="bulk-actions">
+        <button id="btn-bulk-pin" type="button" class="icon-btn" data-i18n-title="ui.btnBulkPin.title" data-icon="pin"></button>
+        <button id="btn-bulk-folder" type="button" class="icon-btn" data-i18n-title="ui.btnBulkFolder.title" data-icon="folder"></button>
+        <button id="btn-bulk-export" type="button" class="icon-btn" data-i18n-title="ui.btnBulkExport.title" data-icon="download"></button>
+        <button id="btn-bulk-delete" type="button" class="icon-btn" data-i18n-title="ui.btnBulkDelete.title" data-icon="trash"></button>
+      </div>
+      <input id="bulk-folder-input" type="text" list="folder-list" data-i18n-placeholder="ui.bulkFolderInput.placeholder" autocomplete="off" spellcheck="false" hidden>
+    </div>
+    <button id="btn-settings" type="button" class="side-item" data-icon="settings" data-i18n="ui.btnSettings"></button>
+  </aside>
+  <div id="backdrop"></div>
+
+  <div id="main">
+    <header id="topbar">
+      <button id="btn-side-open" type="button" class="icon-btn" data-i18n-title="ui.btnSideOpen.title" data-icon="sidebar"></button>
+      <button id="btn-new-top" type="button" class="icon-btn" data-i18n-title="ui.btnNewTop.title" data-icon="compose"></button>
+      <span id="status"></span>
+      <span id="project-chip" class="project-chip" data-i18n-title="ui.projectChip.title" data-icon="project" hidden><span id="project-name"></span></span>
+      <span id="image-state" class="image-state" hidden></span>
+      <span class="spacer"></span>
+      <span id="ctx" data-i18n-title="ui.ctx.title"><span id="ctx-text"></span><span id="ctx-bar"><span id="ctx-fill"></span></span></span>
+    </header>
+
+    <div id="splash"></div>
+    <main id="log" hidden></main>
+    <button id="btn-bottom" type="button" class="to-bottom" data-i18n-title="ui.btnBottom.title" data-icon="arrow-down" hidden></button>
+
+    <footer id="composer">
+      <section id="btw" class="btw" aria-label="btw" hidden>
+        <div class="btw-head">
+          <span>btw <small data-i18n="ui.btw.small1"></small></span>
+          <button id="btn-btw-close" type="button" class="icon-btn" data-i18n-title="ui.btnBtwClose.title" data-icon="x"></button>
+        </div>
+        <div id="btw-log" class="btw-log"></div>
+        <div class="btw-row">
+          <textarea id="btw-input" rows="1" data-i18n-placeholder="ui.btwInput.placeholder" autocomplete="off" spellcheck="false"></textarea>
+          <button id="btn-btw-send" type="button" class="send" data-i18n-title="ui.btnBtwSend.title" data-icon="arrow-up"></button>
+          <button id="btn-btw-stop" type="button" class="send" data-i18n-title="ui.btnBtwStop.title" data-icon="stop" hidden></button>
+        </div>
+      </section>
+      <section id="imgbar" class="imgbar" data-i18n-aria-label="ui.imgbar.ariaLabel" hidden>
+        <div class="imgbar-row">
+          <span class="seg" role="group" data-i18n-aria-label="ui.imgbar.span1.ariaLabel">
+            <button id="btn-img-generate" type="button" data-i18n-title="ui.btnImgGenerate.title" data-i18n="ui.btnImgGenerate"></button>
+            <button id="btn-img-edit" type="button" data-i18n-title="ui.btnImgEdit.title" data-i18n="ui.btnImgEdit"></button>
+          </span>
+          <label class="imgbar-field" id="img-model-field" hidden><span data-i18n="ui.imgModelField.text"></span><select id="img-model" data-i18n-title="ui.imgModel.title"></select></label>
+          <label class="imgbar-field"><span data-i18n="ui.imgbar.label1.text"></span><select id="img-size" data-i18n-title="ui.imgSize.title">
+            <option value="square" data-i18n="ui.imgSize.option1"></option>
+            <option value="landscape" data-i18n="ui.imgSize.option2"></option>
+            <option value="portrait" data-i18n="ui.imgSize.option3"></option>
+          </select></label>
+          <label class="imgbar-field"><span data-i18n="ui.imgbar.label2.text"></span><input id="img-seed" type="number" min="0" max="2147483647" step="1" data-i18n-placeholder="ui.imgSeed.placeholder" autocomplete="off" spellcheck="false"></label>
+          <span class="spacer"></span>
+          <button id="btn-img-close" type="button" class="icon-btn" data-i18n-title="ui.btnImgClose.title" data-icon="x"></button>
+        </div>
+        <p id="img-note" class="note"></p>
+      </section>
+      <div class="box">
+        <div id="attachments"></div>
+        <textarea id="input" rows="1" data-i18n-placeholder="ui.input.placeholder" autocomplete="off" spellcheck="false" disabled></textarea>
+        <div class="row">
+          <button id="btn-attach" type="button" class="icon-btn" data-i18n-title="ui.btnAttach.title" data-icon="plus"></button>
+          <input id="file-input" type="file" multiple hidden>
+          <button id="btn-think" type="button" class="toggle" data-i18n-title="ui.btnThink.title" data-icon="bulb" data-i18n="ui.btnThink"></button>
+          <button id="btn-tools" type="button" class="toggle advanced-only" data-i18n-title="ui.btnTools.title" data-icon="tool" data-i18n="ui.btnTools"></button>
+          <button id="btn-btw" type="button" class="toggle advanced-only" data-i18n-title="ui.btnBtw.title" data-icon="aside">btw</button>
+          <button id="btn-image" type="button" class="toggle" data-i18n-title="ui.btnImage.title" data-icon="image" data-i18n="ui.btnImage"></button>
+          <span class="spacer"></span>
+          <span id="token-count" class="token-count advanced-only"></span>
+          <button id="btn-send" type="button" class="send" data-i18n-title="ui.btnSend.title" data-icon="arrow-up" disabled></button>
+          <button id="btn-stop" type="button" class="send" data-i18n-title="ui.btnStop.title" data-icon="stop" hidden></button>
+        </div>
+      </div>
+      <p class="hint" id="hint"></p>
+    </footer>
+  </div>
+</div>
+
+<div id="menu" class="menu" hidden></div>
+
+<div id="settings" class="modal" hidden>
+  <div class="modal-box settings-box" role="dialog" data-i18n-aria-label="ui.settings.div1.ariaLabel">
+    <div class="modal-head">
+      <h2 data-i18n="ui.settings.h21"></h2>
+      <button id="btn-close-settings" type="button" class="icon-btn" data-i18n-title="ui.btnCloseSettings.title" data-icon="x"></button>
+    </div>
+    <div class="settings-layout">
+    <nav id="settings-nav" class="settings-nav" data-i18n-aria-label="ui.settingsNav.ariaLabel">
+      <button type="button" data-pane="general" data-i18n="ui.settingsNav.button1"></button>
+      <button type="button" data-pane="prompt" data-i18n="ui.settingsNav.button2"></button>
+      <button type="button" data-pane="models" data-i18n="ui.settingsNav.button3"></button>
+      <button type="button" data-pane="launch" data-i18n="ui.settingsNav.button4"></button>
+      <button type="button" data-pane="generation" data-i18n="ui.settingsNav.button5"></button>
+      <button type="button" data-pane="image" data-i18n="ui.settingsNav.button6"></button>
+      <button type="button" data-pane="shortcuts" data-i18n="ui.settingsNav.button7"></button>
+      <button type="button" data-pane="data" data-i18n="ui.settingsNav.button8"></button>
+    </nav>
+    <div id="settings-panes" class="modal-body settings-panes">
+      <section data-pane="prompt" hidden>
+        <h3 data-i18n="ui.settingsPanes.h31"></h3>
+        <textarea id="system-prompt" rows="4" autocomplete="off" spellcheck="false"></textarea>
+        <div class="lib">
+          <select id="prompt-select"></select>
+          <button id="btn-prompt-apply" type="button" data-i18n="ui.btnPromptApply"></button>
+          <button id="btn-prompt-delete" type="button" data-i18n="ui.btnPromptDelete"></button>
+        </div>
+        <div class="lib">
+          <input id="prompt-name" type="text" data-i18n-placeholder="ui.promptName.placeholder" autocomplete="off" spellcheck="false">
+          <button id="btn-prompt-save" type="button" data-i18n="ui.btnPromptSave"></button>
+        </div>
+      </section>
+      <section data-pane="models" hidden>
+        <h3 data-i18n="ui.settingsPanes.h32"></h3>
+        <div class="lib">
+          <input id="model-dir" type="text" data-i18n-placeholder="ui.modelDir.placeholder" autocomplete="off" spellcheck="false">
+          <button id="btn-model-dir-browse" type="button" data-i18n="ui.btnModelDirBrowse"></button>
+          <button id="btn-model-dir-apply" type="button" data-i18n="ui.btnModelDirApply"></button>
+        </div>
+        <p id="model-dir-note" class="note"></p>
+        <p id="model-dir-error" class="form-error"></p>
+        <p class="note" data-i18n="ui.settingsPanes.p1"></p>
+        <div id="model-list" class="model-list"></div>
+        <div class="row-btns"><button id="btn-model-rescan" type="button" data-i18n="ui.btnModelRescan"></button></div>
+      </section>
+      <section data-pane="launch" hidden>
+        <h3 data-i18n="ui.settingsPanes.h33"></h3>
+        <p class="note" data-i18n="ui.settingsPanes.p2"></p>
+        <label class="check"><input id="l-vision" type="checkbox"><span data-i18n="ui.settingsPanes.label1.text"></span></label>
+        <div class="grid">
+          <label><span data-i18n="ui.settingsPanes.label2.text"></span><input id="l-context" type="number" min="0" max="1048576" step="512" data-i18n-placeholder="ui.lContext.placeholder"></label>
+        </div>
+        <details class="launch-more">
+          <summary data-i18n="ui.settingsPanes.summary1"></summary>
+          <div class="grid">
+            <label><span data-i18n="ui.settingsPanes.label3.text"></span><input id="l-ubatch" type="number" min="0" max="8192" step="16" data-i18n-placeholder="ui.lUbatch.placeholder"></label>
+            <label><span data-i18n="ui.settingsPanes.label4.text"></span><input id="l-fitMarginMiB" type="number" min="0" max="65536" step="64" data-i18n-placeholder="ui.lFitMarginMiB.placeholder"></label>
+            <label><span data-i18n="ui.settingsPanes.label5.text"></span><select id="l-loadMode">
+              <option value="auto" data-i18n="ui.lLoadMode.option1"></option>
+              <option value="none" data-i18n="ui.lLoadMode.option2"></option>
+              <option value="mmap">mmap</option>
+              <option value="mlock">mlock</option>
+              <option value="mmap+mlock">mmap+mlock</option>
+            </select></label>
+            <label><span data-i18n="ui.settingsPanes.label6.text"></span><input id="l-moeCacheMiB" type="number" min="0" max="65536" step="256" data-i18n-placeholder="ui.lMoeCacheMiB.placeholder"></label>
+            <label><span data-i18n="ui.settingsPanes.label7.text"></span><input id="l-cpuMoe" type="number" min="-1" max="999" step="1" data-i18n-placeholder="ui.lCpuMoe.placeholder"></label>
+            <label><span data-i18n="ui.settingsPanes.label8.text"></span><input id="l-tensorSplit" type="text" data-i18n-placeholder="ui.lTensorSplit.placeholder" autocomplete="off" spellcheck="false"></label>
+            <label><span data-i18n="ui.settingsPanes.label9.text"></span><select id="l-cacheType">
+              <option value="" data-i18n="ui.lCacheType.option1"></option>
+              <option value="f32">f32</option>
+              <option value="bf16">bf16</option>
+              <option value="q8_0">q8_0</option>
+              <option value="q5_1">q5_1</option>
+              <option value="q5_0">q5_0</option>
+              <option value="q4_1">q4_1</option>
+              <option value="q4_0">q4_0</option>
+              <option value="iq4_nl">iq4_nl</option>
+            </select></label>
+          </div>
+        </details>
+        <p id="launch-note" class="note"></p>
+        <p id="launch-error" class="form-error"></p>
+        <div class="row-btns">
+          <button id="btn-launch-apply" type="button" data-i18n="ui.btnLaunchApply"></button>
+          <button id="btn-launch-reset" type="button" data-i18n="ui.btnLaunchReset"></button>
+        </div>
+      </section>
+      <section data-pane="generation" hidden>
+        <h3 data-i18n="ui.settingsPanes.h34"></h3>
+        <p class="note" data-i18n="ui.settingsPanes.p3"></p>
+        <div class="presets" id="presets">
+          <button type="button" data-preset="think" data-qwen data-i18n="ui.presets.button1"></button>
+          <button type="button" data-preset="think-precise" data-qwen data-i18n="ui.presets.button2"></button>
+          <button type="button" data-preset="fast" data-qwen data-i18n="ui.presets.button3"></button>
+          <button type="button" id="btn-model-sampling" hidden data-i18n="ui.btnModelSampling"></button>
+        </div>
+        <div class="grid">
+          <label><span data-i18n="ui.settingsPanes.label10.text"></span><input id="p-temperature" type="number" min="0" max="2" step="0.05" data-i18n-placeholder="ui.pTemperature.placeholder"></label>
+          <label>top_p<input id="p-top_p" type="number" min="0" max="1" step="0.01" data-i18n-placeholder="ui.pTop_p.placeholder"></label>
+          <label>top_k<input id="p-top_k" type="number" min="0" max="200" step="1" data-i18n-placeholder="ui.pTop_k.placeholder"></label>
+          <label>min_p<input id="p-min_p" type="number" min="0" max="1" step="0.01" data-i18n-placeholder="ui.pMin_p.placeholder"></label>
+          <label>presence_penalty<input id="p-presence_penalty" type="number" min="-2" max="2" step="0.1" data-i18n-placeholder="ui.pPresence_penalty.placeholder"></label>
+          <label>repeat_penalty<input id="p-repeat_penalty" type="number" min="0" max="2" step="0.01" data-i18n-placeholder="ui.pRepeat_penalty.placeholder"></label>
+          <label><span data-i18n="ui.settingsPanes.label11.text"></span><input id="p-max_tokens" type="number" min="16" max="131072" step="16" data-i18n-placeholder="ui.pMax_tokens.placeholder"></label>
+          <label><span data-i18n="ui.settingsPanes.label12.text"></span><input id="p-seed" type="number" min="0" step="1" data-i18n-placeholder="ui.pSeed.placeholder"></label>
+        </div>
+      </section>
+      <section data-pane="image" hidden>
+        <h3 data-i18n="ui.settingsPanes.h35"></h3>
+        <p id="image-models" class="note image-models"></p>
+        <label class="check"><input id="o-image-translate" type="checkbox"><span data-i18n="ui.settingsPanes.label13.text"></span></label>
+        <label><span data-i18n="ui.settingsPanes.label14.text"></span><select id="o-image-size">
+          <option value="square" data-i18n="ui.oImageSize.option1"></option>
+          <option value="landscape" data-i18n="ui.oImageSize.option2"></option>
+          <option value="portrait" data-i18n="ui.oImageSize.option3"></option>
+        </select></label>
+        <p class="note" data-i18n="ui.settingsPanes.p4"></p>
+      </section>
+      <section data-pane="general">
+        <h3 data-i18n="ui.settingsPanes.h36"></h3>
+        <label class="check"><input id="o-enter-send" type="checkbox"><span data-i18n="ui.settingsPanes.label15.text"></span></label>
+        <label class="check"><input id="o-advanced" type="checkbox"><span data-i18n="ui.settingsPanes.label16.text"></span></label>
+        <!-- 言語を 2 つ以上用意してあるときだけ出す (app.js) -->
+        <div id="language-row" hidden>
+          <label><span data-i18n="settings.language"></span><select id="o-language"></select></label>
+          <p id="language-note" class="note" data-i18n="settings.languageNote"></p>
+        </div>
+        <p id="storage-note" class="note"></p>
+      </section>
+      <section data-pane="shortcuts" hidden>
+        <h3 data-i18n="ui.shortcuts.h31"></h3>
+        <dl class="keys">
+          <dt><kbd>Ctrl</kbd>+<kbd>Enter</kbd></dt><dd data-i18n="ui.shortcuts.dd1"></dd>
+          <dt><kbd>Esc</kbd></dt><dd data-i18n="ui.shortcuts.dd2"></dd>
+          <dt><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>O</kbd></dt><dd data-i18n="ui.shortcuts.dd3"></dd>
+          <dt><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd></dt><dd data-i18n="ui.shortcuts.dd4"></dd>
+          <dt><kbd>Shift</kbd>+<kbd>Esc</kbd></dt><dd data-i18n="ui.shortcuts.dd5"></dd>
+          <dt><kbd>↑</kbd></dt><dd data-i18n="ui.shortcuts.dd6"></dd>
+          <dt><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd></dt><dd data-i18n="ui.shortcuts.dd7"></dd>
+          <dt><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd></dt><dd data-i18n="ui.shortcuts.dd8"></dd>
+          <dt><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd></dt><dd data-i18n="ui.shortcuts.dd9"></dd>
+          <dt><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>End</kbd></dt><dd data-i18n="ui.shortcuts.dd10"></dd>
+          <dt><kbd>Ctrl</kbd>+<kbd>/</kbd></dt><dd data-i18n="ui.shortcuts.dd11"></dd>
+        </dl>
+      </section>
+      <section data-pane="data" hidden>
+        <h3 data-i18n="ui.settingsPanes.h37"></h3>
+        <div class="row-btns">
+          <button id="btn-import" type="button" data-i18n="ui.btnImport"></button>
+          <button id="btn-export-all" type="button" data-i18n="ui.btnExportAll"></button>
+          <button id="btn-delete-all" type="button" class="danger" data-i18n="ui.btnDeleteAll"></button>
+        </div>
+        <input id="import-file" type="file" accept=".json,application/json" hidden>
+      </section>
+    </div>
+    </div>
+  </div>
+</div>
+
+<div id="model-editor" class="modal" hidden>
+  <div class="modal-box" role="dialog" data-i18n-aria-label="ui.modelEditor.div1.ariaLabel">
+    <div class="modal-head">
+      <h2 id="model-editor-title" data-i18n="ui.modelEditorTitle"></h2>
+      <button id="btn-close-model-editor" type="button" class="icon-btn" data-i18n-title="ui.btnCloseModelEditor.title" data-icon="x"></button>
+    </div>
+    <div id="model-editor-body" class="modal-body"></div>
+  </div>
+</div>
+
+<div id="project" class="modal" hidden>
+  <div class="modal-box" role="dialog" data-i18n-aria-label="ui.project.div1.ariaLabel">
+    <div class="modal-head">
+      <h2 data-i18n="ui.project.h21"></h2>
+      <button id="btn-close-project" type="button" class="icon-btn" data-i18n-title="ui.btnCloseProject.title" data-icon="x"></button>
+    </div>
+    <div class="modal-body">
+      <section>
+        <label><span data-i18n="ui.project.label1.text"></span><input id="project-name-input" type="text" maxlength="60" autocomplete="off" spellcheck="false"></label>
+      </section>
+      <section>
+        <label><span data-i18n="ui.project.label2.text"></span><textarea id="project-system" rows="5" autocomplete="off" spellcheck="false"></textarea></label>
+      </section>
+      <section>
+        <h3 data-i18n="ui.project.h31"></h3>
+        <div id="project-files" class="project-files"></div>
+        <div class="row-btns"><button id="btn-project-add" type="button" data-i18n="ui.btnProjectAdd"></button></div>
+        <input id="project-file-input" type="file" multiple hidden>
+        <p id="project-note" class="note"></p>
+      </section>
+      <section>
+        <p id="project-error" class="form-error"></p>
+        <div class="row-btns">
+          <button id="btn-project-save" type="button" data-i18n="ui.btnProjectSave"></button>
+          <button id="btn-project-remove" type="button" class="danger" data-i18n="ui.btnProjectRemove"></button>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<div id="drop-overlay" hidden data-i18n="ui.dropOverlay"></div>
+{{LANG}}
+<script>{{SCRIPT}}</script>
+</body>
+</html>
