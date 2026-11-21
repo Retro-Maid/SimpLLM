@@ -89,16 +89,28 @@ The features, in one table:
 
 ## Compared with other chat clients (light! easy! no install!)
 
-| | SimpLLM | LM Studio | Ollama | Open WebUI | TextGen (formerly text-generation-webui) |
-|---|---|---|---|---|---|
-| Setup | Put the folder somewhere | Installer | Installer | Docker or Python | A portable build (about 700 MB) or a build that installs a full Python environment (about 10 GB) |
-| What else you need | llama.cpp (from the official releases, into `bin\`) | Nothing | Nothing | An inference backend (Ollama, for example) | Nothing |
-| Size of the app | About 1 MB | A full application | A full application | A container or a full Python environment | See above |
-| Operating systems | Windows only | Windows, macOS, Linux | Windows, macOS, Linux | Windows, macOS, Linux | Windows, macOS, Linux |
-| Getting models | You download them and put them in place | Search and download inside the app | Download by command | Depends on the backend | Bring your own, or download from the UI |
-| Several users | No (one PC, one person) | No | No | Yes (with accounts) | No |
+Compared using the Windows version of each app as of November 2026 (LM Studio 0.4.28, Ollama 0.40.17).
 
-It is for people who want to run the models they already have on Windows, right away, without installing anything. If you want macOS or Linux, want to browse models inside the app, or want to share it with several people, another tool will suit you better.
+| | SimpLLM | LM Studio | Ollama |
+|---|---|---|---|
+| Setup | Put the folder somewhere | Installer | Installer |
+| What else you need | llama.cpp (from the official releases, into `bin\`) | Nothing | Nothing |
+| Size of the app | About 1 MB | A full application | A full application |
+| Operating systems | Windows only | Windows, macOS, Linux | Windows, macOS (Linux: command line only) |
+| Getting models | You download them and put them in place | Search Hugging Face and download inside the app | Pick and download inside the app |
+| GGUF files you already have | Put them in place and they appear in the list | Import with a command (`lms import`) | Write a Modelfile and import |
+| Regenerate, branch, continue | Yes | Yes | No |
+| System prompt and sampling settings | Set in the UI | Set in the UI | Not in the UI |
+| Load settings (KV cache type and more) | Set in the UI | Set in the UI | Context length only |
+| Chat search, folders, export | Yes (JSON, Markdown) | Yes (PDF, Markdown, plain text) | Rename and delete only |
+| Document attachments | Text, PDF | Text, PDF, docx (RAG for long documents) | Text, PDF, docx and more |
+| Tools | Built in (date and time, calculator, search past chats) | Connect outside tools over MCP | Web search (account required) |
+| Image generation and editing | Yes | No | No |
+| UI languages | 6 | Many (including Japanese) | English only |
+| Network access | None (the UI and browser settings keep it from reaching outside) | Update check at launch, model search and downloads | Regular update checks, cloud features |
+| Source code | Open (MIT) | Closed (free for work use) | Open (MIT) |
+
+SimpLLM is for people who want to run the models they already have on Windows, right away, without installing anything and without any network access. Image generation is in the same window. If you want macOS or Linux, want to browse models inside the app, or want to connect outside tools over MCP, LM Studio will suit you better. If you just want the easiest start, use Ollama.
 
 <a id="requirements"></a>
 

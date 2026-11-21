@@ -89,16 +89,28 @@ Die Funktionen in einer Tabelle:
 
 ## Im Vergleich mit anderen Chat-Clients (leicht! einfach! ohne Installation!)
 
-| | SimpLLM | LM Studio | Ollama | Open WebUI | TextGen (früher text-generation-webui) |
-|---|---|---|---|---|---|
-| Einrichtung | Ordner ablegen | Installationsprogramm | Installationsprogramm | Docker oder Python | Portable Version (etwa 700 MB) oder eine Version, die eine komplette Python-Umgebung installiert (etwa 10 GB) |
-| Was zusätzlich nötig ist | llama.cpp (von den offiziellen Releases nach `bin\`) | Nichts | Nichts | Eine Inferenz-Software (zum Beispiel Ollama) | Nichts |
-| Größe der Anwendung | Etwa 1 MB | Komplette Anwendung | Komplette Anwendung | Container oder komplette Python-Umgebung | Siehe oben |
-| Betriebssysteme | Nur Windows | Windows, macOS, Linux | Windows, macOS, Linux | Windows, macOS, Linux | Windows, macOS, Linux |
-| Modelle beschaffen | Selbst laden und ablegen | In der Anwendung suchen und laden | Per Befehl laden | Hängt von der angebundenen Software ab | Selbst mitbringen oder über die Oberfläche laden |
-| Mehrere Nutzer | Nein (ein PC, eine Person) | Nein | Nein | Ja (mit Konten) | Nein |
+Verglichen wurde die Windows-Version jeder Anwendung, Stand November 2026 (LM Studio 0.4.28, Ollama 0.40.17).
 
-Gedacht ist es für alle, die unter Windows ihre vorhandenen Modelle sofort laufen lassen wollen, ohne etwas zu installieren. Wer macOS oder Linux nutzt, Modelle in der Anwendung suchen oder das Ganze mit mehreren teilen möchte, ist mit einer anderen Software besser bedient.
+| | SimpLLM | LM Studio | Ollama |
+|---|---|---|---|
+| Einrichtung | Ordner ablegen | Installationsprogramm | Installationsprogramm |
+| Was zusätzlich nötig ist | llama.cpp (von den offiziellen Releases nach `bin\`) | Nichts | Nichts |
+| Größe der Anwendung | Etwa 1 MB | Komplette Anwendung | Komplette Anwendung |
+| Betriebssysteme | Nur Windows | Windows, macOS, Linux | Windows, macOS (Linux nur per Befehlszeile) |
+| Modelle beschaffen | Selbst laden und ablegen | In der Anwendung auf Hugging Face suchen und laden | In der Anwendung auswählen und laden |
+| Vorhandene GGUF-Dateien | Ablegen, dann stehen sie in der Liste | Per Befehl importieren (`lms import`) | Modelfile schreiben und importieren |
+| Neu generieren, abzweigen, weiterschreiben | Ja | Ja | Nein |
+| Systemprompt und Sampling-Einstellungen | In der Oberfläche | In der Oberfläche | Nicht in der Oberfläche |
+| Ladeeinstellungen (Typ des KV-Caches und mehr) | In der Oberfläche | In der Oberfläche | Nur die Kontextlänge |
+| Chats durchsuchen, Ordner, Export | Ja (JSON, Markdown) | Ja (PDF, Markdown, Text) | Nur umbenennen und löschen |
+| Dokumente anhängen | Text, PDF | Text, PDF, docx (RAG für lange Dokumente) | Text, PDF, docx und mehr |
+| Tools | Eingebaut (Datum und Uhrzeit, Rechner, Suche in alten Chats) | Externe Tools über MCP anbinden | Websuche (Konto nötig) |
+| Bilder generieren und bearbeiten | Ja | Nein | Nein |
+| Anzeigesprachen | 6 | Viele (auch Japanisch) | Nur Englisch |
+| Verbindungen nach außen | Keine (die Einstellungen der Seite und des Browsers lassen nichts nach außen) | Update-Prüfung beim Start, Modellsuche und Downloads | Regelmäßige Update-Prüfung, Cloud-Funktionen |
+| Quellcode | Offen (MIT) | Nicht offen (auch beruflich kostenlos) | Offen (MIT) |
+
+Gedacht ist SimpLLM für alle, die unter Windows ihre vorhandenen Modelle sofort laufen lassen wollen, ohne etwas zu installieren und ohne jede Verbindung nach außen. Auch Bilder entstehen im selben Fenster. Wer macOS oder Linux nutzt, Modelle in der Anwendung suchen oder externe Tools über MCP anbinden möchte, ist mit LM Studio besser bedient. Wer einfach nur möglichst leicht anfangen will, nimmt Ollama.
 
 <a id="requirements"></a>
 
