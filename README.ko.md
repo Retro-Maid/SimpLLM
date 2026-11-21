@@ -16,6 +16,7 @@
   <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=for-the-badge&amp;labelColor=111111" alt="Windows 10 | 11">
   <img src="https://img.shields.io/badge/PowerShell-5.1-5391FE?style=for-the-badge&amp;labelColor=111111" alt="PowerShell 5.1">
   <img src="https://img.shields.io/badge/llama.cpp-b11669-E8E8E8?style=for-the-badge&amp;labelColor=111111" alt="llama.cpp b11669">
+  <img src="https://img.shields.io/badge/stable--diffusion.cpp-c6dfa9d-E8E8E8?style=for-the-badge&amp;labelColor=111111" alt="stable-diffusion.cpp c6dfa9d">
   <img src="https://img.shields.io/badge/NVIDIA-CUDA%2012.4-76B900?style=for-the-badge&amp;labelColor=111111" alt="NVIDIA CUDA 12.4">
   <img src="https://img.shields.io/badge/Browser-Chrome%20%7C%20Edge-4285F4?style=for-the-badge&amp;labelColor=111111" alt="Browser Chrome | Edge">
 </p>
@@ -136,6 +137,22 @@ cudart-llama-bin-win-cuda-12.4-x64.zip
 - AMD나 Intel의 GPU. CUDA 버전에서는 쓰이지 않습니다. Vulkan 버전(`llama-<버전>-bin-win-vulkan-x64.zip`)을 `bin\`에 넣으면 될 수도 있습니다
 
 표시 언어는 처음에는 Windows의 언어를 따릅니다. 설정의 "일반"에서 바꿀 수 있습니다.
+
+### 이미지 생성·편집을 쓸 때 (선택)
+
+이미지는 llama.cpp가 아니라 [stable-diffusion.cpp](https://github.com/leejet/stable-diffusion.cpp)로 만듭니다. 이미지가 필요 없다면 넣지 않아도 됩니다.
+
+1. [공식 릴리스](https://github.com/leejet/stable-diffusion.cpp/releases)에서 아래 두 파일을 받아, 내용물을 `bin\sd\`에 넣습니다 (`bin\` 바로 아래가 아닙니다). 동작을 확인한 버전은 master-1031-c6dfa9d입니다
+
+   ```
+   sd-master-<버전>-bin-win-cuda12-x64.zip
+   cudart-sd-bin-win-cu12-x64.zip
+   ```
+
+2. 이미지 모델의 본체, 텍스트 인코더, VAE를 `models\image\<모델 이름>\`에 함께 넣습니다. 필요한 파일의 종류는 [models/README.md](models/README.md) (일본어)에 있습니다
+3. 입력란의 "이미지" 버튼 (`Ctrl+Shift+G`)으로 씁니다
+
+개발용 PC (RTX 3060, VRAM 12GB)에서는 1024×1024 이미지 한 장에 Chroma Flash로 약 43초가 걸렸습니다. 모델은 함께 들어 있지 않으며, 받는 곳도 안내하지 않습니다. 어떤 모델을 쓸지, 구하는 방법과 라이선스 확인은 사용자에게 맡깁니다.
 
 <a id="troubleshooting"></a>
 

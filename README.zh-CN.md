@@ -16,6 +16,7 @@
   <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=for-the-badge&amp;labelColor=111111" alt="Windows 10 | 11">
   <img src="https://img.shields.io/badge/PowerShell-5.1-5391FE?style=for-the-badge&amp;labelColor=111111" alt="PowerShell 5.1">
   <img src="https://img.shields.io/badge/llama.cpp-b11669-E8E8E8?style=for-the-badge&amp;labelColor=111111" alt="llama.cpp b11669">
+  <img src="https://img.shields.io/badge/stable--diffusion.cpp-c6dfa9d-E8E8E8?style=for-the-badge&amp;labelColor=111111" alt="stable-diffusion.cpp c6dfa9d">
   <img src="https://img.shields.io/badge/NVIDIA-CUDA%2012.4-76B900?style=for-the-badge&amp;labelColor=111111" alt="NVIDIA CUDA 12.4">
   <img src="https://img.shields.io/badge/Browser-Chrome%20%7C%20Edge-4285F4?style=for-the-badge&amp;labelColor=111111" alt="Browser Chrome | Edge">
 </p>
@@ -136,6 +137,22 @@ cudart-llama-bin-win-cuda-12.4-x64.zip
 - AMD 和 Intel 的 GPU。CUDA 版不会用到它们。把 Vulkan 版（`llama-<版本>-bin-win-vulkan-x64.zip`）放入 `bin\` 也许能用
 
 显示语言一开始跟随 Windows 的语言。可以在设置的“常规”中更改。
+
+### 使用图像生成与编辑时（可选）
+
+图像不是由 llama.cpp 生成，而是由 [stable-diffusion.cpp](https://github.com/leejet/stable-diffusion.cpp) 生成。不需要图像的话，可以不装。
+
+1. 从[官方发布页](https://github.com/leejet/stable-diffusion.cpp/releases)下载下面两个文件，把其中的内容放入 `bin\sd\`（不是直接放进 `bin\`）。已确认可用的版本是 master-1031-c6dfa9d
+
+   ```
+   sd-master-<版本>-bin-win-cuda12-x64.zip
+   cudart-sd-bin-win-cu12-x64.zip
+   ```
+
+2. 把图像模型的本体、文本编码器和 VAE 一起放入 `models\image\<模型名>\`。所需文件的种类见 [models/README.md](models/README.md)（日语）
+3. 使用输入框中的“图像”按钮（`Ctrl+Shift+G`）
+
+在开发用的电脑（RTX 3060，显存 12GB）上，用 Chroma Flash 生成一张 1024×1024 的图像大约需要 43 秒。不随附任何模型，也不推荐下载来源。使用哪个模型、如何获取以及确认许可证，都由用户自行决定。
 
 <a id="troubleshooting"></a>
 

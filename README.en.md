@@ -16,6 +16,7 @@
   <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=for-the-badge&amp;labelColor=111111" alt="Windows 10 | 11">
   <img src="https://img.shields.io/badge/PowerShell-5.1-5391FE?style=for-the-badge&amp;labelColor=111111" alt="PowerShell 5.1">
   <img src="https://img.shields.io/badge/llama.cpp-b11669-E8E8E8?style=for-the-badge&amp;labelColor=111111" alt="llama.cpp b11669">
+  <img src="https://img.shields.io/badge/stable--diffusion.cpp-c6dfa9d-E8E8E8?style=for-the-badge&amp;labelColor=111111" alt="stable-diffusion.cpp c6dfa9d">
   <img src="https://img.shields.io/badge/NVIDIA-CUDA%2012.4-76B900?style=for-the-badge&amp;labelColor=111111" alt="NVIDIA CUDA 12.4">
   <img src="https://img.shields.io/badge/Browser-Chrome%20%7C%20Edge-4285F4?style=for-the-badge&amp;labelColor=111111" alt="Browser Chrome | Edge">
 </p>
@@ -136,6 +137,22 @@ Some things have not been tried.
 - AMD and Intel GPUs. The CUDA build does not use them. Putting the Vulkan build (`llama-<version>-bin-win-vulkan-x64.zip`) into `bin\` might work
 
 The display language follows the Windows language at first. You can change it under "General" in Settings.
+
+### Generating and editing images (optional)
+
+Images are made by [stable-diffusion.cpp](https://github.com/leejet/stable-diffusion.cpp), not by llama.cpp. If you do not need images, you can skip this.
+
+1. Download these two files from the [official releases](https://github.com/leejet/stable-diffusion.cpp/releases) and put their contents into `bin\sd\` (not directly into `bin\`). The version it was tested with is master-1031-c6dfa9d
+
+   ```
+   sd-master-<version>-bin-win-cuda12-x64.zip
+   cudart-sd-bin-win-cu12-x64.zip
+   ```
+
+2. Put the image model's main file, text encoder and VAE together into `models\image\<model name>\`. The kinds of files needed are listed in [models/README.md](models/README.md) (Japanese)
+3. Use the "Image" button in the input box (`Ctrl+Shift+G`)
+
+On the development PC (RTX 3060, 12 GB VRAM), one 1024×1024 image took about 43 seconds with Chroma Flash. No models are bundled and no download sources are recommended. Which model to use, getting it and checking its license are up to you.
 
 <a id="troubleshooting"></a>
 

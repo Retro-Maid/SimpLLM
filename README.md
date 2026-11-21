@@ -16,6 +16,7 @@
   <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=for-the-badge&amp;labelColor=111111" alt="Windows 10 | 11">
   <img src="https://img.shields.io/badge/PowerShell-5.1-5391FE?style=for-the-badge&amp;labelColor=111111" alt="PowerShell 5.1">
   <img src="https://img.shields.io/badge/llama.cpp-b11669-E8E8E8?style=for-the-badge&amp;labelColor=111111" alt="llama.cpp b11669">
+  <img src="https://img.shields.io/badge/stable--diffusion.cpp-c6dfa9d-E8E8E8?style=for-the-badge&amp;labelColor=111111" alt="stable-diffusion.cpp c6dfa9d">
   <img src="https://img.shields.io/badge/NVIDIA-CUDA%2012.4-76B900?style=for-the-badge&amp;labelColor=111111" alt="NVIDIA CUDA 12.4">
   <img src="https://img.shields.io/badge/Browser-Chrome%20%7C%20Edge-4285F4?style=for-the-badge&amp;labelColor=111111" alt="Browser Chrome | Edge">
 </p>
@@ -136,6 +137,22 @@ cudart-llama-bin-win-cuda-12.4-x64.zip
 - AMD や Intel の GPU。CUDA 版では使われません。Vulkan 版（`llama-<版>-bin-win-vulkan-x64.zip`）を `bin\` に入れれば動くかもしれません
 
 表示言語は、最初は Windows の言語に合わせます。設定の「一般」で変えられます。
+
+### 画像の生成・編集を使うとき（任意）
+
+画像は llama.cpp ではなく [stable-diffusion.cpp](https://github.com/leejet/stable-diffusion.cpp) で作ります。使わないなら入れなくてかまいません。
+
+1. [公式のリリース](https://github.com/leejet/stable-diffusion.cpp/releases) から次の 2 つを落とし、中身を `bin\sd\` に入れます（`bin\` の直下ではありません）。動作を確かめた版は master-1031-c6dfa9d です
+
+   ```
+   sd-master-<版>-bin-win-cuda12-x64.zip
+   cudart-sd-bin-win-cu12-x64.zip
+   ```
+
+2. 画像モデルの本体・テキストエンコーダ・VAE を、`models\image\<モデル名>\` にまとめて置きます。必要なファイルの種類は [models/README.md](models/README.md) にあります
+3. 入力欄の「画像」（`Ctrl+Shift+G`）で使います
+
+開発用の PC（RTX 3060、VRAM 12GB）では、1024×1024 の 1 枚に Chroma Flash で約 43 秒かかりました。モデルは同梱しておらず、入手先も案内しません。どのモデルを使うか、入手とライセンスの確認は利用者に任せます。
 
 <a id="troubleshooting"></a>
 

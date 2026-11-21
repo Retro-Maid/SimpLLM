@@ -16,6 +16,7 @@
   <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=for-the-badge&amp;labelColor=111111" alt="Windows 10 | 11">
   <img src="https://img.shields.io/badge/PowerShell-5.1-5391FE?style=for-the-badge&amp;labelColor=111111" alt="PowerShell 5.1">
   <img src="https://img.shields.io/badge/llama.cpp-b11669-E8E8E8?style=for-the-badge&amp;labelColor=111111" alt="llama.cpp b11669">
+  <img src="https://img.shields.io/badge/stable--diffusion.cpp-c6dfa9d-E8E8E8?style=for-the-badge&amp;labelColor=111111" alt="stable-diffusion.cpp c6dfa9d">
   <img src="https://img.shields.io/badge/NVIDIA-CUDA%2012.4-76B900?style=for-the-badge&amp;labelColor=111111" alt="NVIDIA CUDA 12.4">
   <img src="https://img.shields.io/badge/Browser-Chrome%20%7C%20Edge-4285F4?style=for-the-badge&amp;labelColor=111111" alt="Browser Chrome | Edge">
 </p>
@@ -136,6 +137,22 @@ Manches ist nicht ausprobiert.
 - GPUs von AMD und Intel. Die CUDA-Version nutzt sie nicht. Mit der Vulkan-Version (`llama-<Version>-bin-win-vulkan-x64.zip`) in `bin\` könnte es gehen
 
 Die Anzeigesprache richtet sich zunächst nach der Sprache von Windows. Ändern lässt sie sich in den Einstellungen unter „Allgemein“.
+
+### Bilder generieren und bearbeiten (optional)
+
+Bilder entstehen mit [stable-diffusion.cpp](https://github.com/leejet/stable-diffusion.cpp), nicht mit llama.cpp. Wer keine Bilder braucht, kann das weglassen.
+
+1. Diese beiden Dateien von den [offiziellen Releases](https://github.com/leejet/stable-diffusion.cpp/releases) laden und ihren Inhalt nach `bin\sd\` legen (nicht direkt nach `bin\`). Getestet wurde mit der Version master-1031-c6dfa9d
+
+   ```
+   sd-master-<Version>-bin-win-cuda12-x64.zip
+   cudart-sd-bin-win-cu12-x64.zip
+   ```
+
+2. Hauptdatei, Text-Encoder und VAE des Bildmodells zusammen nach `models\image\<Modellname>\` legen. Welche Arten von Dateien nötig sind, steht in [models/README.md](models/README.md) (auf Japanisch)
+3. Im Eingabefeld die Schaltfläche „Bild“ (`Ctrl+Shift+G`) verwenden
+
+Auf dem Entwicklungs-PC (RTX 3060, 12 GB VRAM) dauerte ein Bild mit 1024×1024 mit Chroma Flash etwa 43 Sekunden. Modelle sind nicht enthalten, und es werden keine Bezugsquellen empfohlen. Welches Modell man nimmt, woher man es bekommt und ob die Lizenz passt, entscheidet man selbst.
 
 <a id="troubleshooting"></a>
 

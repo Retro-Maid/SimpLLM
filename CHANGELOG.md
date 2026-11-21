@@ -30,6 +30,7 @@ SimpLLM の版ごとの変更をまとめています。版の番号は [セマ�
 ### 変更
 
 - README の比較表を、LM Studio・Ollama との比較に絞って書き直した
+- 画像の生成・編集に使う stable-diffusion.cpp と画像モデルの入れ方を、README・`bin/README.md`・`models/README.md` に書いた（動作を確かめた版: master-1031-c6dfa9d）
 
 ## [1.0.0] - 2026-11-17
 
