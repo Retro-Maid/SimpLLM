@@ -6,6 +6,7 @@
   "browser.noneFound": "找不到 Chrome，也找不到 Edge。",
   "browser.noneFoundDetail": "位於其他位置的 Chrome 系瀏覽器，可用 start.bat -Browser <執行檔的路徑> 指定。或以 -NoBrowser 啟動，再開啟顯示的 URL。",
   "browser.notFound": "找不到以 -Browser 指定的瀏覽器。",
+  "build.badVersion": "版本檔案（src\\version.txt）的內容不是「1.2.3」的形式：{text}",
   "build.done": "已重新產生 UI：{path}",
   "build.missingFile": "缺少 UI 的檔案：{name}",
   "build.missingLang": "缺少語言檔案：{dir}",

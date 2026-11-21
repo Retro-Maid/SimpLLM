@@ -122,7 +122,8 @@ if (-not $BuildOnly) {
         # 終了の手順の記録 (時刻と手順だけ。起動のたびに上書き)
         $script:sessionLogPath = [IO.Path]::Combine($runDir, "last-session.log")
         [IO.File]::WriteAllText($script:sessionLogPath, "", $utf8)
-        Write-SessionLog "launcher started (pid $PID)"
+        $appVersion = try { [IO.File]::ReadAllText([IO.Path]::Combine($PSScriptRoot, 'version.txt'), $utf8).Trim() } catch { '?' }
+        Write-SessionLog "launcher started (SimpLLM $appVersion, pid $PID)"
     } catch {
         Fail (L 'folder.notWritable') (L 'folder.notWritableDetail' @{ root = $root })
     }

@@ -29,6 +29,10 @@ function Update-UI([string]$root, [int]$controlPort, [switch]$Force, [string]$Ui
         $lines.Add("lang/$code|$($file.Length)|$($file.LastWriteTimeUtc.Ticks)")
     }
     if ($langFiles.Count -eq 0) { throw (L 'build.missingLang' @{ dir = $langDir }) }
+    # SimpLLM の版 (src\version.txt の 1 行。版の番号はここにだけ書く)。設定画面の「情報」に出す
+    $versionFile = [IO.FileInfo]::new(([IO.Path]::Combine([IO.Path]::GetDirectoryName($ui), 'version.txt')))
+    if (-not $versionFile.Exists) { throw (L 'build.missingFile' @{ name = 'version.txt' }) }
+    $lines.Add("version|$($versionFile.Length)|$($versionFile.LastWriteTimeUtc.Ticks)")
     $builder = [IO.FileInfo]::new($PSCommandPath)
     $lines.Add("builder=$($builder.Length)|$($builder.LastWriteTimeUtc.Ticks)")
     $signature = $lines -join "`n"
@@ -47,6 +51,9 @@ function Update-UI([string]$root, [int]$controlPort, [switch]$Force, [string]$Ui
     # (Git の設定によっては、取得したファイルの改行が CRLF になる)
     $readText = { param($name) [IO.File]::ReadAllText(([IO.Path]::Combine($ui, $name)), $utf8).Replace("`r`n", "`n").Replace("`r", "`n") }
     $template = & $readText 'index.html'
+    # セマンティックバージョニングの形 (1.2.3、1.2.3-beta.1 など) だけを受け付ける。HTML に入れるので、記号の混入もここで防ぐ
+    $version = [IO.File]::ReadAllText($versionFile.FullName, $utf8).Trim()
+    if ($version -notmatch '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-[0-9A-Za-z.-]+)?$') { throw (L 'build.badVersion' @{ text = $version }) }
     $css = & $readText 'style.css'
     $js = ($jsFiles | ForEach-Object { & $readText $_ }) -join "`n;`n"
     if ($js -match '(?i)</script|<script|<!--' -or $css -match '(?i)</style') { throw (L 'build.unsafeSource') }
@@ -55,7 +62,7 @@ function Update-UI([string]$root, [int]$controlPort, [switch]$Force, [string]$Ui
         $scriptHash = 'sha256-' + [Convert]::ToBase64String($sha.ComputeHash($utf8.GetBytes($js)))
         $styleHash = 'sha256-' + [Convert]::ToBase64String($sha.ComputeHash($utf8.GetBytes($css)))
     } finally { $sha.Dispose() }
-    $html = $template.Replace('{{SCRIPT_HASH}}', $scriptHash).Replace('{{STYLE_HASH}}', $styleHash).Replace('{{CONTROL_PORT}}', "$controlPort")
+    $html = $template.Replace('{{SCRIPT_HASH}}', $scriptHash).Replace('{{STYLE_HASH}}', $styleHash).Replace('{{CONTROL_PORT}}', "$controlPort").Replace('{{VERSION}}', $version)
     # 画像を先に入れ、JS/CSS は最後に入れる (ソース中の {{LOGO}} などを置き換えてハッシュを壊さない)
     $html = $html.Replace('{{WORDMARK}}', [IO.File]::ReadAllText(([IO.Path]::Combine($ui, 'wordmark.svg')), $utf8))
     foreach ($image in @(@('LOGO', 'logo.webp'), @('FAVICON16', 'favicon-16.png'), @('FAVICON32', 'favicon-32.png'))) {

@@ -138,6 +138,7 @@
       <button type="button" data-pane="image" data-i18n="ui.settingsNav.button6"></button>
       <button type="button" data-pane="shortcuts" data-i18n="ui.settingsNav.button7"></button>
       <button type="button" data-pane="data" data-i18n="ui.settingsNav.button8"></button>
+      <button type="button" data-pane="about" data-i18n="ui.settingsNav.button9"></button>
     </nav>
     <div id="settings-panes" class="modal-body settings-panes">
       <section data-pane="prompt" hidden>
@@ -274,6 +275,20 @@
           <button id="btn-delete-all" type="button" class="danger" data-i18n="ui.btnDeleteAll"></button>
         </div>
         <input id="import-file" type="file" accept=".json,application/json" hidden>
+      </section>
+      <!-- 版は src\version.txt から作成時に入れる。ソースの場所はリンクにしない (画面から外へ通信しない) -->
+      <section data-pane="about" hidden>
+        <h3 data-i18n="ui.settingsPanes.h38"></h3>
+        <dl class="keys about">
+          <dt data-i18n="about.version"></dt><dd id="about-version">{{VERSION}}</dd>
+          <dt data-i18n="about.author"></dt><dd>Retro-Maid</dd>
+          <dt data-i18n="about.license"></dt><dd>MIT License (Copyright (c) 2026 Retro-Maid)</dd>
+          <dt data-i18n="about.source"></dt><dd>https://github.com/Retro-Maid/SimpLLM</dd>
+          <dt data-i18n="about.llama"></dt><dd><span id="about-llama"></span><span id="about-llama-tested" class="note"></span></dd>
+        </dl>
+        <p id="about-llama-old" class="form-error" hidden></p>
+        <p class="note" data-i18n="about.licenseNote"></p>
+        <p class="note" data-i18n="about.updateNote"></p>
       </section>
     </div>
     </div>

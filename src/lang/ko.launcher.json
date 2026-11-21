@@ -6,6 +6,7 @@
   "browser.noneFound": "Chrome도 Edge도 찾을 수 없습니다.",
   "browser.noneFoundDetail": "다른 위치에 있는 Chrome 계열 브라우저는 start.bat -Browser <실행 파일 경로> 로 지정할 수 있습니다. 또는 -NoBrowser로 시작한 뒤 표시된 URL을 여세요.",
   "browser.notFound": "-Browser로 지정한 브라우저를 찾을 수 없습니다.",
+  "build.badVersion": "버전 파일 (src\\version.txt)의 내용이 \"1.2.3\" 형식이 아닙니다: {text}",
   "build.done": "UI를 다시 만들었습니다: {path}",
   "build.missingFile": "UI 파일이 없습니다: {name}",
   "build.missingLang": "언어 파일이 없습니다: {dir}",

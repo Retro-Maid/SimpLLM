@@ -488,6 +488,8 @@ select { background: var(--bg); color: var(--text); border: 1px solid var(--bord
 .keys { display: grid; grid-template-columns: max-content 1fr; gap: 8px 16px; margin: 0; font-size: 13px; }
 .keys dt { color: var(--text); white-space: nowrap; }
 .keys dd { margin: 0; color: var(--text-2); }
+.about dd { overflow-wrap: anywhere; }
+.about dd .note { display: block; margin-top: 2px; }
 kbd { font-family: ui-monospace, Consolas, monospace; font-size: 12px; padding: 1px 6px; border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 5px; background: var(--bg); color: var(--text); }
 
 /* ---- サイドバー上部のボタン・プロジェクトの表示 ---- */

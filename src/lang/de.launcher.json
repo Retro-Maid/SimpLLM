@@ -6,6 +6,7 @@
   "browser.noneFound": "Weder Chrome noch Edge wurde gefunden.",
   "browser.noneFoundDetail": "Ein Chromium-basierter Browser an einem anderen Ort lässt sich mit start.bat -Browser <Pfad der ausführbaren Datei> angeben. Oder mit -NoBrowser starten und die angezeigte URL öffnen.",
   "browser.notFound": "Der mit -Browser angegebene Browser wurde nicht gefunden.",
+  "build.badVersion": "Die Versionsdatei (src\\version.txt) enthält keine Version der Form „1.2.3“: {text}",
   "build.done": "Die UI wurde neu erzeugt: {path}",
   "build.missingFile": "Eine UI-Datei fehlt: {name}",
   "build.missingLang": "Die Sprachdateien fehlen: {dir}",

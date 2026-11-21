@@ -17,6 +17,7 @@ const els = {
   drop: $('drop-overlay'),
   settings: $('settings'), btnSettings: $('btn-settings'), btnCloseSettings: $('btn-close-settings'), settingsNav: $('settings-nav'), settingsPanes: $('settings-panes'),
   systemPrompt: $('system-prompt'), enterSend: $('o-enter-send'), advanced: $('o-advanced'), storageNote: $('storage-note'),
+  aboutLlama: $('about-llama'), aboutLlamaTested: $('about-llama-tested'), aboutLlamaOld: $('about-llama-old'),
   launchNote: $('launch-note'), launchError: $('launch-error'), btnLaunchApply: $('btn-launch-apply'), btnLaunchReset: $('btn-launch-reset'),
   presets: $('presets'), btnModelSampling: $('btn-model-sampling'),
   promptSelect: $('prompt-select'), promptName: $('prompt-name'), btnPromptApply: $('btn-prompt-apply'), btnPromptDelete: $('btn-prompt-delete'), btnPromptSave: $('btn-prompt-save'),
@@ -3515,6 +3516,7 @@ async function checkServer() {
     if (!res.ok) { serverUnavailable(tx('status.serverError', { status: res.status })); retry(5000); return; }
     const models = (await res.json()).data;
     if (stale()) return;
+    checkLlamaBuild(); // 待たない (読み込みの確認とは別に進める)
     renderModels(models);
     const want = models.find((m) => m.id === settings.model) || models[0];
     if (!want) { serverUnavailable(tx('status.noModel')); return; }
@@ -3815,6 +3817,39 @@ function loadSettingsPane(name) {
   if (name === 'models') { loadModelDir(); refreshInventory(); refreshImageStatus(); }
   else if (name === 'launch') loadLaunch();
   else if (name === 'image') refreshImageStatus();
+  else if (name === 'about') renderAbout();
+}
+
+// 動作を確かめた llama.cpp の版 (README の b11669 と合わせる)。これより古いと、使う引数や API が無いことがある
+const LLAMA_TESTED_BUILD = 11669;
+// 使っている llama.cpp の版。サーバーの /props の build_info ("b11669-620d2225c") から 1 度だけ読む
+// (起動を遅くしないよう、llama-server --version は使わない)。null: まだ読めていない
+let llamaBuild = null;
+let llamaBuildRequest = null;
+function checkLlamaBuild() {
+  if (llamaBuild || llamaBuildRequest || !state.apiKey) return;
+  llamaBuildRequest = (async () => {
+    try {
+      const res = await fetch('/props', { headers: authHeaders(), credentials: 'omit' });
+      if (!res.ok) return;
+      const text = String((await res.json()).build_info || '');
+      const m = /^b(\d+)/.exec(text);
+      llamaBuild = { text, number: m ? Number(m[1]) : 0 };
+    } catch { return; } // 次にサーバーを確かめたときに読み直す
+    finally { llamaBuildRequest = null; }
+    renderAbout();
+    if (llamaBuild.number && llamaBuild.number < LLAMA_TESTED_BUILD) showError(llamaOldText());
+  })();
+}
+
+const llamaOldText = () => tx('about.llamaOld', { build: `b${llamaBuild.number}`, tested: `b${LLAMA_TESTED_BUILD}` });
+
+function renderAbout() {
+  els.aboutLlama.textContent = llamaBuild ? (llamaBuild.text || '?') : tx('about.llamaUnknown');
+  els.aboutLlamaTested.textContent = tx('about.llamaTested', { build: `b${LLAMA_TESTED_BUILD}` });
+  const old = !!(llamaBuild && llamaBuild.number && llamaBuild.number < LLAMA_TESTED_BUILD);
+  els.aboutLlamaOld.hidden = !old;
+  els.aboutLlamaOld.textContent = old ? llamaOldText() : '';
 }
 
 // pane: 開く項目の名前 (ボタンから呼ばれたときはイベントが渡るので、文字列のときだけ使う)

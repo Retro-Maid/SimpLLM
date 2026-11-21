@@ -6,6 +6,7 @@
   "browser.noneFound": "Chrome も Edge も見つかりません。",
   "browser.noneFoundDetail": "別の場所にある Chrome 系のブラウザは、start.bat -Browser <実行ファイルのパス> で指定できます。または -NoBrowser で起動し、表示された URL を開いてください。",
   "browser.notFound": "-Browser で指定したブラウザが見つかりません。",
+  "build.badVersion": "バージョンのファイル (src\\version.txt) の中身が「1.2.3」の形ではありません: {text}",
   "build.done": "UI を再生成しました: {path}",
   "build.missingFile": "UIのファイルがありません: {name}",
   "build.missingLang": "言語のファイルがありません: {dir}",
